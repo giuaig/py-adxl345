@@ -4,7 +4,8 @@ import time
 from adxl345.i2c import ADXL345
 
 def main():
-  adxl = ADXL345()
+  # Standard address 0x1D with 'alternate=False' or alternate address 0x53 with 'alternate=True'. Use 'sudo i2cdetect -y 1'.
+  adxl = ADXL345(alternate=True)
 
   # Set data rate at about 2 hz
   rate_hz = adxl.set_data_rate(2)
@@ -22,5 +23,5 @@ def main():
 
   # Go back to sleep mode
   adxl.power_off()
-    
+
 main()

@@ -111,10 +111,10 @@ class ADXL345_Base:
     elif hz < 25/128:
       rate = 25/256
       rate_code = 0
-    
+
     if low_power:
       rate_code = rate_code | 0x10
-    
+
     self.set_register(ADXL345_Base.REG_BW_RATE, rate_code)
     return rate;
 
@@ -133,7 +133,7 @@ class ADXL345_Base:
 
   def _set_power_ctl(self, measure, wake_up=0, sleep=0, auto_sleep=0, link=0):
     power_ctl = wake_up & 0x03
-    
+
     if sleep:
       power_ctl |= 0x04
     if measure:
@@ -142,12 +142,12 @@ class ADXL345_Base:
       power_ctl |= 0x10
     if link:
       power_ctl |= 0x20
-    
+
     self.set_register(ADXL345_Base.REG_POWER_CTL, power_ctl)
 
   def _send_data_format(self, self_test=0, spi=0, int_invert=0, justify=0):
     data_format = self._range & 0x03
-    
+
     if justify:
       data_format |= 0x04
     if self._full_resolution:
@@ -158,16 +158,16 @@ class ADXL345_Base:
       data_format |= 0x40
     if self_test:
       data_format |= 0x80
-    
+
     self.set_register(ADXL345_Base.REG_DATA_FORMAT, data_format)
 
   def _set_fifo_mode(self, mode=0, trigger=0, samples=0x1F):
     fifo_ctl = samples & 0x1F
     fifo_ctl = fifo_ctl | ((mode & 0x03) << 6)
-    
+
     if trigger:
       fifo_ctl |= 0x20
-    
+
     self.set_register(ADXL345_Base.REG_FIFO_CTL, fifo_ctl)
 
   def power_on(self):
@@ -230,7 +230,7 @@ class ADXL345_Base:
       value = value / ADXL345_Base.SCALE_FACTOR / 4
       bytes = int(value)& 0xFF
       return bytes
-    
+
     self.set_register(ADXL345_Base.REG_OFSX, convert_offet(x))
     self.set_register(ADXL345_Base.REG_OFSY, convert_offet(y))
     self.set_register(ADXL345_Base.REG_OFSZ, convert_offet(z))
@@ -243,7 +243,7 @@ class ADXL345_Base:
     x = samples['x']
     y = samples['y']
     z = samples['z']
-    
+
     abs_x = math.fabs(x)
     abs_y = math.fabs(y)
     abs_z = math.fabs(z)
@@ -267,10 +267,30 @@ class ADXL345_Base:
     offset_x = cal_x - x
     offset_y = cal_y - y
     offset_z = cal_z - z
-    
+
     self.set_offset(offset_x, offest_y, offset_z)
-    
+
     return {'x': offset_x,
             'y': offset_y,
             'z': offset_z}
 
+
+  # def low_pass_filter(self, Val):
+  #   """ Return filtered value. Based on: http://theccontinuum.com/2012/09/24/arduino-imu-pitch-roll-from-accelerometer/ """
+  #   ALPHA = float(0.5)
+  #   fVal = float(0)   #ERROR!! fVal need to change each iteration..
+
+  #   fVal = Val * ALPHA + (fVal * (1.0 - ALPHA))
+  #   return fVal
+
+
+  def pitch(self, x, y, z):
+    """ Return Pitch angle. Based on: http://theccontinuum.com/2012/09/24/arduino-imu-pitch-roll-from-accelerometer/ """
+    pitch = (math.atan2(x, math.sqrt(y*y + z*z))*180.0)/math.pi
+    return pitch
+
+
+  def roll(self, y, z):
+    """ Return Roll angle. Based on: http://theccontinuum.com/2012/09/24/arduino-imu-pitch-roll-from-accelerometer/ """
+    roll = (math.atan2(-y, z)*180.0)/math.pi
+    return roll

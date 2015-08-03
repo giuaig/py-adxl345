@@ -21,11 +21,31 @@ def main():
   # Turn off sleep mode (default when powered)
   adxl.power_on()
 
+
+  InterruptEnable = 0x2E
+  FreeFall = 0x04
+  InterruptSource = 0x30
+  adxl.set_register(InterruptEnable, FreeFall)
+
   # Indefinitely print acceleration measures
   print("Press CTRL-C to stop")
   while True:
     val = adxl.get_axes()
-    print("X,Y,Z: " + str(val))
-    time.sleep(1)
+
+    x = val['x']
+    y = val['y']
+    z = val['z']
+
+    #print("X,Y,Z: " + str(x) + "\t" + str(y) + "\t" + str(z))
+
+    ##values = adxl.get_registers(InterruptSource, 8)
+    ##print( "Values: " + str(values) )
+
+    #[dataready, singletap, doubletap, activity, inactivity, freefall, watermark, overrun] = adxl345.getInterruptStatus()
+    [dataready, singletap, doubletap, activity, inactivity, freefall, watermark, overrun] = adxl.getOptions(InterruptSource)
+
+    if freefall:
+      print("Falling!!!")
+
 
 main()

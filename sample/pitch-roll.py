@@ -26,6 +26,22 @@ def main():
   while True:
     val = adxl.get_axes()
     print("X,Y,Z: " + str(val))
+
+    #print("x " + str(val['x']))
+
+    x = val['x']
+    y = val['y']
+    z = val['z']
+
+    # fX = adxl.low_pass_filter( float(x) )
+    # fY = adxl.low_pass_filter( float(y) )
+    # fZ = adxl.low_pass_filter( float(z) )
+
+    # print("Filtered: X, Y, Z: " + str(fX) + "\t" + str(fY) + "\t" + str(fZ))
+
+    p = adxl.pitch(x, y, z)
+    r = adxl.roll(y, z)
+    print("Pitch: " + str(p) + "\t" + "Roll: " + str(r))
     time.sleep(1)
 
 main()
